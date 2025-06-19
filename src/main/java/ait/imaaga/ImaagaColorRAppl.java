@@ -1,6 +1,5 @@
 package ait.imaaga;
 
-import ait.imaaga.dto.ColorReasponseDto;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.RequestEntity;
@@ -9,8 +8,24 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 
-public class ImaagaColorAppl {
+
+record ColorDtor(String closest_palette_color, String closest_palette_color_parent, double percent) {
+}
+
+record SubResultDtor(List<ColorDtor> background_colors, List<ColorDtor> foreground_colors,
+                     List<ColorDtor> image_colors) {
+}
+
+record ResultDtor(SubResultDtor colors) {
+}
+
+
+record ColorReasponseDtor(ResultDtor result) {
+}
+
+public class ImaagaColorRAppl {
     public static void main(String[] args) {
         String imgUrl = "https://imagga.com/static/images/tagging/wind-farm-538576_640.jpg";
         RestTemplate restTemplate = new RestTemplate();
@@ -20,12 +35,13 @@ public class ImaagaColorAppl {
                 .queryParam("image_url", imgUrl);
         URI url = builder.build().toUri();
         RequestEntity<String> request = new RequestEntity<>(headers, HttpMethod.GET, url);
-        ResponseEntity<ColorReasponseDto> response = restTemplate.exchange(request, ColorReasponseDto.class);
+        ResponseEntity<ColorReasponseDtor> response = restTemplate.exchange(request, ColorReasponseDtor.class);
+
         System.out.println("Foreground Colors:");
-        response.getBody().getResult().getColors().getForeground_colors().forEach(System.out::println);
+        response.getBody().result().colors().foreground_colors().forEach(System.out::println);
         System.out.println("Background Colors:");
-        response.getBody().getResult().getColors().getBackground_colors().forEach(System.out::println);
+        response.getBody().result().colors().background_colors().forEach(System.out::println);
         System.out.println("Image Colors:");
-        response.getBody().getResult().getColors().getImage_colors().forEach(System.out::println);
+        response.getBody().result().colors().image_colors().forEach(System.out::println);
     }
 }

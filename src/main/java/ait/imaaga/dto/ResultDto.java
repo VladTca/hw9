@@ -6,5 +6,5 @@ import lombok.Getter;
 
 @Getter
 public class ResultDto {
-    private SubRusultDto colors;
+    private SubResultDto colors;
 }
